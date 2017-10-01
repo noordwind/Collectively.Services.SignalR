@@ -23,7 +23,7 @@ namespace Collectively.Services.SignalR.Services
         }
 
         public async Task PublishOperationUpdatedAsync(OperationUpdated @event)
-            => await _hubContext.Clients.All.InvokeAsync("operation_updated",
+            => await PublishToUserAsync(@event.UserId, "operation_updated",
                 new
                 {
                     requestId = @event.RequestId,
@@ -42,7 +42,7 @@ namespace Collectively.Services.SignalR.Services
                 return;
             }
             var remark = remarkDto.Value;
-            await _hubContext.Clients.All.InvokeAsync("photos_to_remark_added",
+            await PublishToAllAsync("photos_to_remark_added",
                 new
                 {
                     remarkId = remark.Id,
@@ -67,7 +67,7 @@ namespace Collectively.Services.SignalR.Services
                 return;
             }
             var remark = remarkDto.Value;
-            await _hubContext.Clients.All.InvokeAsync("photos_from_remark_removed",
+            await PublishToAllAsync("photos_from_remark_removed",
                 new
                 {
                     remarkId = remark.Id,
@@ -77,7 +77,7 @@ namespace Collectively.Services.SignalR.Services
         }
 
         public async Task PublishRemarkVoteSubmittedAsync(RemarkVoteSubmitted @event)
-            => await _hubContext.Clients.All.InvokeAsync("remark_vote_submitted",
+            => await PublishToAllAsync("remark_vote_submitted",
                 new
                 {
                     remarkId = @event.RemarkId,
@@ -88,12 +88,18 @@ namespace Collectively.Services.SignalR.Services
             );
 
         public async Task PublishRemarkVoteDeletedAsync(RemarkVoteDeleted @event)
-            => await _hubContext.Clients.All.InvokeAsync("remark_vote_deleted",
+            => await PublishToAllAsync("remark_vote_deleted",
                 new
                 {
                     remarkId = @event.RemarkId,
                     userId = @event.UserId,
                 }
             );
+
+        private async Task PublishToAllAsync(string operation, object message)
+            => await _hubContext.Clients.All.InvokeAsync(operation, message);
+
+        private async Task PublishToUserAsync(string userId, string operation, object message)
+            => await _hubContext.Clients.Group(userId).InvokeAsync(operation, message);
     }
 }

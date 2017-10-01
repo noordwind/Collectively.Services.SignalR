@@ -5,13 +5,12 @@ using Collectively.Common.Extensions;
 using Collectively.Common.Security;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using Collectively.Services.SignalR.Services;
 
 namespace Collectively.Services.SignalR.Hubs
 {
     public class CollectivelyHub : Hub
     {
-        private readonly ConcurrentDictionary<string, ISet<string>> _users = 
-            new ConcurrentDictionary<string, ISet<string>>();
         private readonly IJwtTokenHandler _jwtHandler;
 
         public CollectivelyHub(IJwtTokenHandler jwtHandler)
@@ -39,13 +38,7 @@ namespace Collectively.Services.SignalR.Hubs
             {
                 await DisconnectAsync();
             }
-            var userId = jwt.Subject;
-            var connections = new HashSet<string>();
-            if(!_users.ContainsKey(userId))
-            {
-                _users[userId] = connections;
-            }
-            _users[userId].Add(Context.ConnectionId);
+            await Groups.AddAsync(Context.ConnectionId, jwt.Subject);
         }
 
         private async Task DisconnectAsync()
