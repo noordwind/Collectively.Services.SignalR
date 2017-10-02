@@ -31,12 +31,16 @@ namespace Collectively.Services.SignalR.Hubs
                 if (maybeJwt.HasNoValue)
                 {
                     await DisconnectAsync();
+
+                    return;
                 }
                 jwt = maybeJwt.Value;
             }
             catch
             {
                 await DisconnectAsync();
+
+                return;
             }
             await Groups.AddAsync(Context.ConnectionId, jwt.Subject);
         }
