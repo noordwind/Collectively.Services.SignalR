@@ -97,9 +97,9 @@ namespace Collectively.Services.SignalR.Services
             );
 
         private async Task PublishToAllAsync(string operation, object message)
-            => await _hubContext.Clients.All.InvokeAsync(operation, message);
+            => await _hubContext.Clients.All.SendAsync(operation, message);
 
         private async Task PublishToUserAsync(string userId, string operation, object message)
-            => await _hubContext.Clients.Group(userId).InvokeAsync(operation, message);
+            => await _hubContext.Clients.Group(userId).SendAsync(operation, message);
     }
 }

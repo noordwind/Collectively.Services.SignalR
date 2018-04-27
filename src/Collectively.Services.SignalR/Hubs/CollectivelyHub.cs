@@ -47,7 +47,7 @@ namespace Collectively.Services.SignalR.Hubs
 
         private async Task DisconnectAsync()
         {
-            await this.Clients.Client(this.Context.ConnectionId).InvokeAsync("disconnect");
+            await this.Clients.Client(this.Context.ConnectionId).SendAsync("disconnect");
         }
     }
 }
